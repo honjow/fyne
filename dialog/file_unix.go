@@ -1,3 +1,4 @@
+//go:build !windows && !android && !ios
 // +build !windows,!android,!ios
 
 package dialog
@@ -16,8 +17,8 @@ func (f *fileDialog) getPlaces() []favoriteItem {
 		fyne.LogError("could not create lister for /", err)
 		return []favoriteItem{}
 	}
-	return []favoriteItem{favoriteItem{
-		"Computer",
+	return []favoriteItem{{
+		getZhLocName("Computer"),
 		theme.ComputerIcon(),
 		lister,
 	}}

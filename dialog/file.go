@@ -85,15 +85,15 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 				f.open.Enable()
 			}
 		}
-		saveName.SetPlaceHolder("Enter filename")
+		saveName.SetPlaceHolder("输入文件名")
 		f.fileName = saveName
 	} else {
 		f.fileName = widget.NewLabel("")
 	}
 
-	label := "Open"
+	label := "打开"
 	if f.file.save {
-		label = "Save"
+		label = "保存"
 	}
 	f.open = widget.NewButton(label, func() {
 		if f.file.callback == nil {
@@ -123,12 +123,12 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 				return
 			} else if err == nil && listable {
 				// a directory has been selected
-				ShowInformation("Cannot overwrite",
-					"Files cannot replace a directory,\ncheck the file name and try again", f.file.parent)
+				ShowInformation("无法覆盖",
+					"文件不能替换目录,\n检查文件名并重试", f.file.parent)
 				return
 			}
 
-			ShowConfirm("Overwrite?", "Are you sure you want to overwrite the file\n"+name+"?",
+			ShowConfirm("覆盖文件?", "确定覆盖这个文件吗\n"+name+"?",
 				func(ok bool) {
 					if !ok {
 						return
@@ -161,7 +161,7 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 	if f.file.save {
 		f.fileName.SetText(f.initialFileName)
 	}
-	dismissLabel := "Cancel"
+	dismissLabel := "取消"
 	if f.file.dismissText != "" {
 		dismissLabel = f.file.dismissText
 	}
@@ -189,9 +189,9 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 
 	f.breadcrumb = container.NewHBox()
 	f.breadcrumbScroll = container.NewHScroll(container.NewPadded(f.breadcrumb))
-	title := label + " File"
+	title := label + "文件"
 	if f.file.isDirectory() {
-		title = label + " Folder"
+		title = label + "目录"
 	}
 
 	f.setView(gridView)
@@ -254,7 +254,7 @@ func (f *fileDialog) makeUI() fyne.CanvasObject {
 }
 
 func (f *fileDialog) optionsMenu(position fyne.Position, buttonSize fyne.Size) {
-	hiddenFiles := widget.NewCheck("Show Hidden Files", func(changed bool) {
+	hiddenFiles := widget.NewCheck("显示隐藏文件", func(changed bool) {
 		f.showHidden = changed
 		f.refreshDir(f.dir)
 	})
@@ -276,7 +276,7 @@ func (f *fileDialog) loadFavorites() {
 	favoriteOrder := getFavoriteOrder()
 
 	f.favorites = []favoriteItem{
-		{locName: "Home", locIcon: theme.HomeIcon(), loc: favoriteLocations["Home"]}}
+		{locName: getZhLocName("Home"), locIcon: theme.HomeIcon(), loc: favoriteLocations["Home"]}}
 	app := fyne.CurrentApp()
 	if hasAppFiles(app) {
 		f.favorites = append(f.favorites,
@@ -291,7 +291,7 @@ func (f *fileDialog) loadFavorites() {
 		}
 		locIcon := favoriteIcons[locName]
 		f.favorites = append(f.favorites,
-			favoriteItem{locName: locName, locIcon: locIcon, loc: loc})
+			favoriteItem{locName: getZhLocName(locName), locIcon: locIcon, loc: loc})
 	}
 }
 
@@ -737,6 +737,16 @@ func getFavoriteOrder() []string {
 	}
 
 	return order
+}
+
+func getZhLocName(locName string) string {
+	zhLocnameMap := map[string]string{"Home": "主页", "Computer": "计算机", "Documents": "文档", "Downloads": "下载", "Music": "音乐", "Pictures": "图片", "Videos": "视频", "Movies": "视频"}
+	zhLocname, ok := zhLocnameMap[locName]
+	if ok {
+		return zhLocname
+	} else {
+		return locName
+	}
 }
 
 func hasAppFiles(a fyne.App) bool {
